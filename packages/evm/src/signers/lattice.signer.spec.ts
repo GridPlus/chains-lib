@@ -1,9 +1,9 @@
 import type { Msg } from '@xdefi-tech/chains-core';
 import fetch from 'cross-fetch';
 
-import { BitcoinProvider } from '../chain.provider';
+import { EvmProvider } from '../chain.provider';
 import { IndexerDataSource } from '../datasource';
-import { BITCOIN_MANIFEST } from '../manifests';
+import { EVM_MANIFESTS } from '../manifests';
 import type { ChainMsg, MsgBody } from '../msg';
 
 import LatticeSigner from './lattice.signer';
@@ -24,7 +24,7 @@ const CONFIG = {
 describe('lattice.signer', () => {
   let signer: LatticeSigner;
   let derivationPath: string;
-  let provider: BitcoinProvider;
+  let provider: EvmProvider;
   let txInput: MsgBody;
   let message: Msg;
 
@@ -36,20 +36,24 @@ describe('lattice.signer', () => {
   });
 
   beforeEach(async () => {
-    provider = new BitcoinProvider(new IndexerDataSource(BITCOIN_MANIFEST));
+    provider = new EvmProvider(new IndexerDataSource(EVM_MANIFESTS.ethereum));
     derivationPath = "m/84'/0'/0'/0/0";
 
     txInput = {
-      from: 'bc1q7xytdr3syzgs4f29lj8fg68egw2wysltwtlznl',
-      to: 'bc1qqqszrzvw3l5437qw66df0779ycuumwhnnf5yqz',
-      amount: 0.000001,
+      from: '0xdfb2682febe6ea96682b1018702958980449b7db',
+      to: '0xeffe6e5bbb53625daa6bb04adab4f42f1150c64c',
+      chainId: 1,
+      amount: 0.001,
+      decimals: EVM_MANIFESTS.ethereum.decimals,
+      nonce: 0,
     };
 
     message = provider.createMsg(txInput);
   });
 
   it('should get an address from the lattice device', async () => {
-    expect(await signer.getAddress(derivationPath)).toBe(txInput.from);
+    const address = await signer.getAddress(derivationPath);
+    expect(address).toBe(txInput.from);
   }, 100000);
 
   it('should sign a transaction using a lattice device', async () => {
