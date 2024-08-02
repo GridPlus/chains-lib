@@ -19,15 +19,7 @@ export class LatticeProvider extends Provider {
     this.initialized = true;
   }
 
-  static async create({
-    deviceId,
-    password,
-    name,
-  }: {
-    deviceId: string;
-    password: string;
-    name: string;
-  }): Promise<any> {
+  static async init({ deviceId, password, name }: { deviceId: string; password: string; name: string }) {
     let clientData = '';
 
     const getStoredClient = () => clientData;

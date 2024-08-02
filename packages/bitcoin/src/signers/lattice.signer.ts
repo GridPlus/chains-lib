@@ -15,7 +15,7 @@ export class LatticeSigner extends Signer.LatticeProvider {
     password: string;
     name: string;
   }): Promise<LatticeSigner> {
-    const { clientData, isPaired } = await super.create({
+    const { clientData, isPaired } = await super.init({
       deviceId,
       password,
       name,

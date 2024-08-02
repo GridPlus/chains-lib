@@ -3,17 +3,7 @@
   "compilerOptions": {
     "lib": ["esnext", "dom"],
     "baseUrl": "./",
-    "outDir": "./dist",
-    "paths": {
-      "crypto": [
-        "node_modules/crypto-browserify",
-        "../../node_modules/crypto-browserify"
-      ],
-      "stream": [
-        "node_modules/stream-browserify",
-        "../../node_modules/stream-browserify"
-      ]
-    }
+    "outDir": "./dist"
   },
   "allowJs": true,
   "include": ["!./src/custom.d.ts", "./src/**/*.ts", "!src/**/*.spec.*"]

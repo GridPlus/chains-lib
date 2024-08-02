@@ -1,7 +1,6 @@
 import { Signer, SignerDecorator } from '@xdefi-tech/chains-core';
 import { fetchAddresses, sign, Constants } from 'gridplus-sdk';
 import { type UnsignedTransaction, utils, BigNumber } from 'ethers';
-// import { TransactionFactory } from '@ethereumjs/tx';
 
 import type { ChainMsg, TxData } from '../msg';
 
@@ -16,7 +15,7 @@ export class LatticeSigner extends Signer.LatticeProvider {
     password: string;
     name: string;
   }): Promise<LatticeSigner> {
-    const { clientData, isPaired } = await super.create({
+    const { clientData, isPaired } = await super.init({
       deviceId,
       password,
       name,

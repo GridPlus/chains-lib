@@ -14,6 +14,7 @@ import {
   LAMPORTS_PER_SOL,
   VersionedTransaction,
   ComputeBudgetProgram,
+  TransactionMessage,
 } from '@solana/web3.js';
 import {
   TOKEN_PROGRAM_ID,
@@ -90,14 +91,10 @@ export class ChainMsg extends BasMsg<MsgBody, TxBody> {
     const recipientPublicKey = new PublicKey(msgData.to);
     let value;
     const contractInfo: any = {};
-    const { blockhash } = await this.provider.rpcProvider.getRecentBlockhash();
+    const { blockhash } = await this.provider.rpcProvider.getLatestBlockhash();
 
-    const transaction = new SolanaTransaction({
-      feePayer: senderPublicKey,
-      recentBlockhash: blockhash,
-    });
+    const instructions = [];
 
-    let instruction;
     if (msgData.contractAddress) {
       const mintPublicKey = new PublicKey(msgData.contractAddress);
 
@@ -119,42 +116,39 @@ export class ChainMsg extends BasMsg<MsgBody, TxBody> {
       contractInfo.toTokenAddress = toTokenAcc.toBase58();
       contractInfo.fromTokenAddress = fromTokenAcc.toBase58();
 
-      instruction = createTransferInstruction(
-        fromTokenAcc,
-        toTokenAcc,
-        senderPublicKey,
-        value
+      instructions.push(
+        createTransferInstruction(
+          fromTokenAcc,
+          toTokenAcc,
+          senderPublicKey,
+          value
+        )
       );
       decimals = mint.decimals;
     } else {
       value = new BigNumber(msgData.amount)
         .multipliedBy(LAMPORTS_PER_SOL)
         .toNumber();
-      instruction = new TransactionInstruction({
-        keys: [
-          { pubkey: senderPublicKey, isSigner: true, isWritable: true },
-          { pubkey: recipientPublicKey, isSigner: false, isWritable: true },
-        ],
-        programId: SystemProgram.programId, // token vs native
-        data: SystemProgram.transfer({
+      instructions.push(
+        SystemProgram.transfer({
           fromPubkey: senderPublicKey,
           toPubkey: recipientPublicKey,
           lamports: value,
-        }).data,
-      });
+        })
+      );
       programId = SystemProgram.programId;
     }
 
     if (msgData.priorityFeeAmount) {
-      const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: msgData.priorityFeeAmount,
-      });
-      transaction.add(addPriorityFee);
+      instructions.unshift(
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: msgData.priorityFeeAmount,
+        })
+      );
     }
-    transaction.add(instruction);
 
     if (msgData.memo) {
-      transaction.add(
+      instructions.push(
         new TransactionInstruction({
           keys: [{ pubkey: senderPublicKey, isSigner: true, isWritable: true }],
           programId: new PublicKey(
@@ -171,6 +165,14 @@ export class ChainMsg extends BasMsg<MsgBody, TxBody> {
         ? (options[GasFeeSpeed.medium] as number)
         : DEFAULT_FEE;
     }
+
+    const messageV0 = new TransactionMessage({
+      payerKey: senderPublicKey,
+      recentBlockhash: blockhash,
+      instructions,
+    }).compileToV0Message();
+
+    const transaction = new VersionedTransaction(messageV0);
 
     return {
       tx: transaction,
