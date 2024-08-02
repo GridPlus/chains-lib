@@ -37,7 +37,6 @@
     "bitcoinjs-lib": "5.2.0",
     "coinselect": "3.1.13",
     "eslint-config-custom": "*",
-    "gridplus-sdk": "^2.5.2",
     "reflect-metadata": "0.1.13",
     "rimraf": "4.4.0",
     "rxjs": "7.8.0",
@@ -62,6 +61,7 @@
       "src/signers/react-native.ts",
       "src/index.ts"
     ],
+    "outDir": "dist",
     "format": "cjs",
     "splitting": false,
     "dts": true,

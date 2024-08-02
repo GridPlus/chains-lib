@@ -39,7 +39,7 @@ export class LedgerSigner extends Signer.Provider {
     const transaction = tx as SolanaTransaction;
     const signedTx = await app.signTransaction(
       derivation,
-      transaction.serializeMessage()
+      transaction.serialize()
     );
 
     const addressBuffer = await app.getAddress(derivation);

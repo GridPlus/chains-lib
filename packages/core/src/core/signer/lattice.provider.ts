@@ -1,13 +1,11 @@
 import { setup } from 'gridplus-sdk';
 
-import { Injectable } from '../../common';
 import type { MsgData } from '../msg';
 
 import { Provider } from './signer.provider';
 
 const HARDENED_OFFSET = 0x80000000; // Hardened offset
 
-@Injectable()
 export class LatticeProvider extends Provider {
   private static instance: LatticeProvider;
   public initialized = false;
@@ -21,15 +19,7 @@ export class LatticeProvider extends Provider {
     this.initialized = true;
   }
 
-  static async create({
-    deviceId,
-    password,
-    name,
-  }: {
-    deviceId: string;
-    password: string;
-    name: string;
-  }): Promise<LatticeProvider> {
+  static async init({ deviceId, password, name }: { deviceId: string; password: string; name: string }) {
     let clientData = '';
 
     const getStoredClient = () => clientData;
@@ -45,7 +35,10 @@ export class LatticeProvider extends Provider {
       setStoredClient,
     });
 
-    return new LatticeProvider(clientData, isPaired);
+    return {
+      clientData,
+      isPaired,
+    };
   }
 
   static convertDerivationPathToArray(path: string): number[] {

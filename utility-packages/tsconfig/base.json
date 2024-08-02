@@ -21,7 +21,29 @@
     "preserveWatchOutput": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "paths": {
+      "stream": [
+        "node_modules/stream-browserify",
+        "../../node_modules/stream-browserify"
+      ],
+      "http": [
+        "node_modules/http-browserify",
+        "../../node_modules/http-browserify"
+      ],
+      "https": [
+        "node_modules/https-browserify",
+        "../../node_modules/https-browserify"
+      ],
+      "zlib": [
+        "node_modules/zlib-browserify",
+        "../../node_modules/zlib-browserify"
+      ],
+      "crypto": [
+        "node_modules/crypto-browserify",
+        "../../node_modules/crypto-browserify"
+      ]
+    }
   },
   "exclude": ["node_modules"],
   "references": [{ "path": "../**/" }]
